@@ -1,4 +1,4 @@
-package iscte.pt;
+package pt.iscte.pcd;
 
 public class Starter {
 

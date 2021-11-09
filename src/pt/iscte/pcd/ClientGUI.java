@@ -1,6 +1,4 @@
-package iscte.pt;
-import java.awt.BorderLayout;
-import java.awt.Container;
+package pt.iscte.pcd;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -30,7 +28,7 @@ public class ClientGUI {
 		
 		JTextField textFieldConsulta = new JTextField(20);
 		JTextField textFieldComprimento = new JTextField(20);
-		JLabel labelConsulta = new JLabel("Posição a consultar:");
+		JLabel labelConsulta = new JLabel("Posiï¿½ï¿½o a consultar:");
 		JLabel labelComprimento = new JLabel("Comprimento:");
 		JButton buttonConsultar = new JButton("Consultar");
 		JTextArea textAreaRespostas = new JTextArea(900,200);
