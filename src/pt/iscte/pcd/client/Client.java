@@ -1,4 +1,6 @@
-package pt.iscte.pcd;
+package pt.iscte.pcd.client;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -11,11 +13,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-public class ClientGUI {
+public class Client {
 	
 	private JFrame frame;
 	
-	public ClientGUI() {
+	public Client() {
 		
 		this.frame = new JFrame("Client");
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -28,7 +30,7 @@ public class ClientGUI {
 		
 		JTextField textFieldConsulta = new JTextField(20);
 		JTextField textFieldComprimento = new JTextField(20);
-		JLabel labelConsulta = new JLabel("Posi��o a consultar:");
+		JLabel labelConsulta = new JLabel("Posição a consultar:");
 		JLabel labelComprimento = new JLabel("Comprimento:");
 		JButton buttonConsultar = new JButton("Consultar");
 		JTextArea textAreaRespostas = new JTextArea(900,200);
@@ -55,7 +57,7 @@ public class ClientGUI {
 
 	public static void main(String[] args) {
 		
-		ClientGUI frame = new ClientGUI();
+		Client frame = new Client();
 		
 	}
 
