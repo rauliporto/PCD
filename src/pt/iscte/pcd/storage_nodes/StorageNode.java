@@ -16,15 +16,13 @@ import java.nio.file.Paths;
 public class StorageNode {
 
     private static final int DATA_FILE_SIZE = 1000000; //É capaz de não ser necessário - PARA MIM É REMOVER, NÃO FAZ SENTIDO
-    private byte[] data; //Guardar a informação, esta informação corresponde a 1 000 000Bytes - TEMOS QUE CONFIRMAR SE é CLOUD O BYTE
-    private CloudByte file;
-    private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
+     private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
     private ConsoleTracker tracker; //Uma thread para monotorizar se são injetados erros na consola
     private ByteErrorChecker checker; //Duas threads que vão estar a percorrer os bytes do node para verificação de erros
 
-    private String nodeAdress; //localhost
-    private String directoryPort; //8080
-    private String nodePort; //8081, 8082, etc.
+    private final String nodeAdress; //localhost
+    private final String directoryPort; //8080
+    private final String nodePort; //8081, 8082, etc.
 
     // Referente à inscrição no diretorio
     private BufferedReader in;
@@ -74,8 +72,8 @@ public class StorageNode {
         String register_string = "INSC 127.0.0.1 " + nodePort;
         System.out.println(register_string);
         out.println(register_string);
-        String str = in.readLine();
-        System.out.println(str);
+       // String str = in.readLine();
+       // System.out.println(str);
  // Está a faltar algo pois fica preso aqui o codigo - perguntei como funciona o diretorio para perceber o que é necessário
     }
 
@@ -115,12 +113,31 @@ public class StorageNode {
 
 
 
-    public static void main(String[] args) throws IOException {
-        System.out.println(args[0]);
-        StorageNode novo_no = new StorageNode("127.0.0.1", "8080", "8081", "data.bin");
-        novo_no.connect();
-        novo_no.register();
-        novo_no.disconnect();
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+
+        //Iniciação do Nó
+        StorageNode newNode = new StorageNode("127.0.0.1", "8080", "8081", "data.bin");
+        newNode.connect();
+        newNode.register();
+
+
+
+
+        // Iniciação da Consola
+
+
+        //Iniciação do Server para GUI
+
+        ConsoleTracker console = new ConsoleTracker();
+        console.start();
+
+
+
+
+        // while true
+        while(true)
+        Thread.sleep(300);
 
     }
 

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="diretorio">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/imported/diretorio.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
