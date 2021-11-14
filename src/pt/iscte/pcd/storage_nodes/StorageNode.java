@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 public class StorageNode {
 
     private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
-    private Console console;
+    private Console console; // consola para responder aos comandos de erro solicitados
     private ByteErrorChecker checker;
     private final String nodeAdress;
     private final String directoryPort;
@@ -24,8 +24,8 @@ public class StorageNode {
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-
     private CloudByte[] cloudArrayFile;
+
 
     //Construtor - se argumento diferente de nullo converte para cloudbytes, caso contrario ....
     public StorageNode(String directoryAdress, String directoryPort, String nodePort, String fileName) throws IOException {
@@ -34,15 +34,12 @@ public class StorageNode {
         this.nodePort = nodePort;
         if (fileName != null)
             convertToCloudBytes(fileName);
-        console = new Console(cloudArrayFile);
-        console.start();
-
     }
 
-    public StorageNode(String nodeAdress, String directoryPort, String nodePort) {
-        this.nodeAdress = nodeAdress;
-        this.directoryPort = directoryPort;
-        this.nodePort = nodePort;
+    // Ligação ao diretorio e inicio da consola, da GUI, pedidos e solicitação de pedidos
+    private void start() throws IOException {
+        connect();
+        register();
         console = new Console(cloudArrayFile);
         console.start();
     }
@@ -63,6 +60,7 @@ public class StorageNode {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
     }
+
     // Finalização da socket de contacto com servidor
     private void disconnect() throws IOException {
         socket.close();
@@ -73,9 +71,9 @@ public class StorageNode {
         String register_string = "INSC 127.0.0.1 " + nodePort;
         System.out.println(register_string);
         out.println(register_string);
-       // String str = in.readLine();
-       // System.out.println(str);
- // Está a faltar algo pois fica preso aqui o codigo - perguntei como funciona o diretorio para perceber o que é necessário
+        // String str = in.readLine();
+        // System.out.println(str);
+        // Está a faltar algo pois fica preso aqui o codigo - perguntei como funciona o diretorio para perceber o que é necessário
     }
 
 
@@ -113,29 +111,21 @@ public class StorageNode {
     // Fase 3 - Mecanismos de injeção de erros
 
 
+    public static void main(String[] args) throws IOException {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-
-        //Iniciação do Nó
-        StorageNode newNode = new StorageNode("127.0.0.1", "8080", "8081", "data.bin");
-        newNode.connect();
-        newNode.register();
-
-
-
-
-        // Iniciação da Consola
-
-
-        //Iniciação do Server para GUI
-
-
-
-        // while true
-        while(true)
-        Thread.sleep(300);
+        if ((args.length == 3) || (args.length == 4)) {
+            StorageNode newNode;
+            if (args.length == 3) {
+                newNode = new StorageNode(args[0], args[1], args[2], null);
+            } else {
+                newNode = new StorageNode(args[0], args[1], args[2], args[4]);
+            }
+            newNode.start();
+        } else {
+            System.err.println("Argumentos Inválidos");
+        }
 
     }
+
 
 }
