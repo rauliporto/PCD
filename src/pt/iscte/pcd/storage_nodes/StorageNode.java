@@ -36,6 +36,15 @@ public class StorageNode {
             convertToCloudBytes(fileName);
     }
 
+    //Convert o ficheiro em array de cloudbytes
+    private void convertToCloudBytes(String fileName) throws IOException {
+        byte[] fileArray = Files.readAllBytes(Paths.get(fileName));
+        cloudArrayFile = new CloudByte[fileArray.length];
+        for (int i = 0; i < fileArray.length; i++) {
+            cloudArrayFile[i] = new CloudByte(fileArray[i]);
+        }
+    }
+
     // Ligação ao diretorio e inicio da consola, da GUI, pedidos e solicitação de pedidos
     private void start() throws IOException {
         connect();
@@ -44,14 +53,6 @@ public class StorageNode {
         console.start();
     }
 
-
-    private void convertToCloudBytes(String fileName) throws IOException {
-        byte[] fileArray = Files.readAllBytes(Paths.get(fileName));
-        cloudArrayFile = new CloudByte[fileArray.length];
-        for (int i = 0; i < fileArray.length; i++) {
-            cloudArrayFile[i] = new CloudByte(fileArray[i]);
-        }
-    }
 
     // Criaçao de socket para contacto com servidor
     private void connect() throws IOException {
@@ -71,16 +72,12 @@ public class StorageNode {
         String register_string = "INSC 127.0.0.1 " + nodePort;
         System.out.println(register_string);
         out.println(register_string);
-        // String str = in.readLine();
-        // System.out.println(str);
-        // Está a faltar algo pois fica preso aqui o codigo - perguntei como funciona o diretorio para perceber o que é necessário
     }
 
 
     // obter a lista de todos os Nós atraves da solicitacao ao diretorio - ESBOÇO
     // Questionei o que responde o diretorio, se um array ou string por cada NÓ
     public String[] getNodesList() throws IOException {
-        connect();
         String[] list = new String[10];
         int i = 0;
         while (true) {
