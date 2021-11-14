@@ -15,16 +15,12 @@ import java.nio.file.Paths;
 
 public class StorageNode {
 
-    private static final int DATA_FILE_SIZE = 1000000; //É capaz de não ser necessário - PARA MIM É REMOVER, NÃO FAZ SENTIDO
-     private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
-    private ConsoleTracker tracker; //Uma thread para monotorizar se são injetados erros na consola
-    private ByteErrorChecker checker; //Duas threads que vão estar a percorrer os bytes do node para verificação de erros
-
-    private final String nodeAdress; //localhost
-    private final String directoryPort; //8080
-    private final String nodePort; //8081, 8082, etc.
-
-    // Referente à inscrição no diretorio
+    private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
+    private Console console;
+    private ByteErrorChecker checker;
+    private final String nodeAdress;
+    private final String directoryPort;
+    private final String nodePort;
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
@@ -38,12 +34,17 @@ public class StorageNode {
         this.nodePort = nodePort;
         if (fileName != null)
             convertToCloudBytes(fileName);
+        console = new Console(cloudArrayFile);
+        console.start();
+
     }
 
     public StorageNode(String nodeAdress, String directoryPort, String nodePort) {
         this.nodeAdress = nodeAdress;
         this.directoryPort = directoryPort;
         this.nodePort = nodePort;
+        console = new Console(cloudArrayFile);
+        console.start();
     }
 
 
@@ -128,10 +129,6 @@ public class StorageNode {
 
 
         //Iniciação do Server para GUI
-
-        ConsoleTracker console = new ConsoleTracker();
-        console.start();
-
 
 
 
