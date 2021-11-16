@@ -10,6 +10,7 @@ import pt.iscte.pcd.CloudByte;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class Console extends Thread {
 
@@ -24,24 +25,21 @@ public class Console extends Thread {
         System.out.println("Consola Ativada:");
         System.out.println(" ");
         System.out.println("Digite ERROR e o numero do byte");
+        Scanner in = new Scanner(System.in);
         while (true) {
-            try {
-                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                String command = input.readLine();
-                //System.out.println(command);
-                if (command != null) {
-                    String[] result = command.split(" ");
-                    if ((result.length == 2) && (result[0].equals("ERROR"))) {
-                        System.out.println("Dados corretos");
-                        System.out.println(("A Injetar erro no byte " + result[1]));
-                        corruptByte(Integer.parseInt(result[1]));
-                    } else
-                        System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+            // BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            String command = in.nextLine();
+            //System.out.println(command);
+            if (command != null) {
+                String[] result = command.split(" ");
+                if ((result.length == 2) && (result[0].equals("ERROR"))) {
+                    System.out.println("Dados corretos");
+                    System.out.println(("A Injetar erro no byte " + result[1]));
+                    corruptByte(Integer.parseInt(result[1]));
                 } else
                     System.out.println("Comando inválido, por favor verifique os dados introduzidos");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } else
+                System.out.println("Comando inválido, por favor verifique os dados introduzidos");
         }
     }
 

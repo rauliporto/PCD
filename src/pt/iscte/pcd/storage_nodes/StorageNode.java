@@ -12,6 +12,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class StorageNode {
 
@@ -25,15 +27,23 @@ public class StorageNode {
     private PrintWriter out;
     private Socket socket;
     private CloudByte[] cloudArrayFile;
+    private ArrayList<String> nodesList;
 
 
-    //Construtor - se argumento diferente de nullo converte para cloudbytes, caso contrario ....
+    //Construtor
     public StorageNode(String directoryAdress, String directoryPort, String nodePort, String fileName) throws IOException {
         this.nodeAdress = directoryAdress;
         this.directoryPort = directoryPort;
         this.nodePort = nodePort;
-        if (fileName != null)
+        if (fileName != null) {
+            System.out.println("Tem ficheiro e converteu-o");
+            start();
             convertToCloudBytes(fileName);
+        } else {
+            System.out.println("Não tem ficheiro e vai buscar os NOS");
+            start();
+            getNodesList();
+        }
     }
 
     //Convert o ficheiro em array de cloudbytes
@@ -43,14 +53,16 @@ public class StorageNode {
         for (int i = 0; i < fileArray.length; i++) {
             cloudArrayFile[i] = new CloudByte(fileArray[i]);
         }
+        System.out.println("Ficheiro totalmente convertido");
     }
 
     // Ligação ao diretorio e inicio da consola, da GUI, pedidos e solicitação de pedidos
     private void start() throws IOException {
         connect();
         register();
-        console = new Console(cloudArrayFile);
+        console = new Console();
         console.start();
+        System.out.println("Registo Efetuado no Diretorio");
     }
 
 
@@ -76,19 +88,22 @@ public class StorageNode {
 
 
     // obter a lista de todos os Nós atraves da solicitacao ao diretorio - ESBOÇO
-    // Questionei o que responde o diretorio, se um array ou string por cada NÓ
-    public String[] getNodesList() throws IOException {
-        String[] list = new String[10];
-        int i = 0;
+    public void getNodesList() throws IOException {
+        nodesList = new ArrayList<String>();
+        String aux;
+        out.println("nodes");
+        System.out.println("A Obter os NOS do diretorio:");
         while (true) {
-            if (("valor" == "end") || ("valor" == "null"))
+            aux = in.readLine();
+            if (aux.equals("END")) {
+                System.out.println("Não existem mais NOS");
                 break;
-            else
-                list[i] = "valor";
+            } else {
+                nodesList.add(aux);
+                System.out.println(aux);
+            }
         }
-        disconnect();
-        return list;
-
+        System.out.println("Finalizada a lista");
     }
 
 
@@ -105,9 +120,55 @@ public class StorageNode {
 
     }
 
-    // Fase 3 - Mecanismos de injeção de erros
+    /* --------------------------------------------------------------------
+       ------------------------------ CONSOLE -----------------------------
+                                   Classe Aninhada
+       --------------------------------------------------------------------  */
+    public class Console extends Thread {
+        public Console() {
+        }
 
+        @Override
+        public void run() {
+            System.out.println("Consola Ativada:");
+            System.out.println(" ");
+            System.out.println("Digite ERROR e o numero do byte");
+            Scanner in = new Scanner(System.in);
+            while (true) {
+                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+                String command = null;
+                try {
+                    command = input.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(command);
+                if (command != null) {
+                    String[] result = command.split(" ");
+                    if ((result.length == 2) && (result[0].equals("ERROR"))) {
+                        System.out.println("Dados corretos");
+                        System.out.println(("A Injetar erro no byte " + result[1]));
+                        corruptByte(Integer.parseInt(result[1]));
+                    } else
+                        System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+                } else
+                    System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+            }
+        }
 
+        private void corruptByte(int nByte) {
+            System.out.println(cloudArrayFile[nByte - 1].toString());
+            cloudArrayFile[nByte - 1].makeByteCorrupt();
+            System.out.println("Byte Corrompido");
+            System.out.println(cloudArrayFile[nByte - 1].toString());
+        }
+
+    }
+
+    /* --------------------------------------------------------------------
+       ------------------------------  MAIN  ------------------------------
+                                   Classe Main
+       --------------------------------------------------------------------  */
     public static void main(String[] args) throws IOException {
 
         if ((args.length == 3) || (args.length == 4)) {
@@ -115,13 +176,14 @@ public class StorageNode {
             if (args.length == 3) {
                 newNode = new StorageNode(args[0], args[1], args[2], null);
             } else {
-                newNode = new StorageNode(args[0], args[1], args[2], args[4]);
+                newNode = new StorageNode(args[0], args[1], args[2], args[3]);
             }
-            newNode.start();
         } else {
             System.err.println("Argumentos Inválidos");
         }
-
+        while (true) {
+    // Verficar esta parte
+        }
     }
 
 
