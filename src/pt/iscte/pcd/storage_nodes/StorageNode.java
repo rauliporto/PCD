@@ -82,7 +82,7 @@ public class StorageNode {
     // Registar nó no diretorio
     public void register() throws IOException {
         String register_string = "INSC 127.0.0.1 " + nodePort;
-        System.out.println(register_string);
+        System.out.println(" Valor da msg a enviar: " + register_string);
         out.println(register_string);
     }
 
