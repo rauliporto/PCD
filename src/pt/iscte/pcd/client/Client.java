@@ -1,5 +1,8 @@
 package pt.iscte.pcd.client;
 
+import pt.iscte.pcd.CloudByte;
+import pt.iscte.pcd.storage_nodes.ByteBlockRequest;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -20,9 +23,9 @@ import javax.swing.WindowConstants;
 
 public class Client {
 
-    private JFrame frame;
-    private String nodeAdress;
-    private String nodePort;
+    private final JFrame frame;
+    private final String nodeAdress;
+    private final String nodePort;
     private BufferedReader in;
     private PrintWriter out;
 
@@ -30,7 +33,7 @@ public class Client {
         this.frame = new JFrame("Client");
         this.nodePort = nodePort;
         this.nodeAdress = nodeAdress;
-		System.out.println("Node a ligar IP: " + nodeAdress + " na porta " + nodePort);
+        System.out.println("Node a ligar AO IP: " + nodeAdress + " na porta " + nodePort);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         addFrameContent();
         frame.pack();
@@ -49,12 +52,15 @@ public class Client {
         buttonConsultar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-				try {
-					requestBytes(1,2);
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
-				System.out.println("O que vai acontecer quando carregar consultar");
+                try {
+
+                    textAreaRespostas.setText(requestBytes(Integer.parseInt(textFieldComprimento.getText()), Integer.parseInt(textFieldConsulta.getText())));
+
+
+                } catch (IOException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+                System.out.println("O que vai acontecer quando carregar consultar");
                 //TODO O QUE ACONTECE QUANDO CARREGO EM CONSULTAR
             }
         });
@@ -70,19 +76,33 @@ public class Client {
         frame.add(textAreaRespostas);
     }
 
-    private void requestBytes(int size, int position) throws IOException {
+    private String requestBytes(int size, int position) throws IOException, ClassNotFoundException {
         InetAddress url = InetAddress.getByName(nodeAdress);
         Socket socket = new Socket(url, Integer.parseInt(nodePort));
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-        String requestString = "REQ " + nodeAdress + " " + nodePort + " " + size + " " + position;
-        System.out.println(" Valor da msg a enviar: " + requestString);
-        out.println(requestString);
 
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        ByteBlockRequest request = new ByteBlockRequest(position, size);
+        out.writeObject(request);
+        System.out.println("Solicitado Bloco ao Node");
+        CloudByte[] received = (CloudByte[]) in.readObject();
+        System.out.println("Informação recebida");
+        String receivedBytes = convertToString(received);
+        socket.close();
+        return receivedBytes;
+    }
+
+    private String convertToString(CloudByte[] received) {
+        String aux = "";
+        for (CloudByte a : received) {
+            aux = (aux + " " + a.getValue());
+        }
+        System.out.println("Valor da Informação recebida: " + aux);
+        return aux;
     }
 
     public static void main(String[] args) {
-		Client frame;
+        Client frame;
         if (args[0] != null && args[1] != null)
             frame = new Client(args[0], args[1]);
 

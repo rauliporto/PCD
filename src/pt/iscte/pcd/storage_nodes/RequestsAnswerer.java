@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class RequestsAnswerer extends Thread {
-    private ServerSocket nodeServerSocket;
+    private final ServerSocket nodeServerSocket;
     private CloudByte[] file;
 
     public RequestsAnswerer(CloudByte[] file, String nodePort) throws IOException {
@@ -38,7 +38,6 @@ public class RequestsAnswerer extends Thread {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     public CloudByte[] getSubCloudBytes(ByteBlockRequest received) {

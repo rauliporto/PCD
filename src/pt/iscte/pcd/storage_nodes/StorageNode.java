@@ -40,6 +40,8 @@ public class StorageNode {
             System.out.println("Tem ficheiro para converter");
             convertToCloudBytes(fileName);
             start();
+            RequestsAnswerer receiveConnection = new RequestsAnswerer(cloudArrayFile,nodePort);
+            receiveConnection.start();
         } else {
             System.out.println("Não tem ficheiro e vai buscar os NOS");
             start();

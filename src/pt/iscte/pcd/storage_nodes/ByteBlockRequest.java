@@ -8,6 +8,10 @@ public class ByteBlockRequest {
         this.length = 100;
 
     }
+    public ByteBlockRequest(int startIndex, int length){
+        this.startIndex = startIndex;
+        this.length = length;
+    }
 
     public int getStartIndex() {
         return startIndex;
