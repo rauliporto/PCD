@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,9 +37,9 @@ public class StorageNode {
         this.directoryPort = directoryPort;
         this.nodePort = nodePort;
         if (fileName != null) {
-            System.out.println("Tem ficheiro e converteu-o");
-            start();
+            System.out.println("Tem ficheiro para converter");
             convertToCloudBytes(fileName);
+            start();
         } else {
             System.out.println("Não tem ficheiro e vai buscar os NOS");
             start();
@@ -105,20 +106,7 @@ public class StorageNode {
         }
         System.out.println("Finalizada a lista");
     }
-
-
-    // Obter ou converter a listagem de dados existentes no Nó para converter para Cloudbyte
-    public void getPresentData() {
-
-
-    }
-
-    // Obter listagem de dados existentens em outro Nó
-    public String[] getFileList(String nome_do_no_a_definir) {
-        String[] fileList = new String[10];
-        return fileList;
-
-    }
+//metodos da coneccao estaticos da classe
 
     /* --------------------------------------------------------------------
        ------------------------------ CONSOLE -----------------------------

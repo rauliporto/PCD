@@ -4,6 +4,8 @@
       <root url="jar://$PROJECT_DIR$/src/imported/diretorio.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/src/imported/diretorio.jar!/" />
+    </SOURCES>
   </library>
 </component>
