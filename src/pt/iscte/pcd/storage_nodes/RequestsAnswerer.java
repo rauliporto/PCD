@@ -17,11 +17,12 @@ public class RequestsAnswerer extends Thread {
 
     @Override
     public void run() {
-        try {
-            Socket nodeSocket = nodeServerSocket.accept();
-            ObjectInputStream in = new ObjectInputStream(nodeSocket.getInputStream());
-            ObjectOutputStream out = new ObjectOutputStream(nodeSocket.getOutputStream());
-            while (true) {
+        while (true) {
+            try {
+                Socket nodeSocket = nodeServerSocket.accept();
+                ObjectInputStream in = new ObjectInputStream(nodeSocket.getInputStream());
+                ObjectOutputStream out = new ObjectOutputStream(nodeSocket.getOutputStream());
+
                 ByteBlockRequest received = (ByteBlockRequest) in.readObject();
                 if (received != null) {
 
@@ -31,14 +32,13 @@ public class RequestsAnswerer extends Thread {
                 } else {
                     System.out.println("Erro ao obter informação do outro node");
                 }
-                // Não sei se é necessário para dar reset ao conteudo das vars
-                out.reset();
-                in.reset();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
+
+
 
     public CloudByte[] getSubCloudBytes(ByteBlockRequest received) {
         CloudByte[] aux = new CloudByte[received.getLength()];

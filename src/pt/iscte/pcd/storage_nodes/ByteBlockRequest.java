@@ -1,6 +1,8 @@
 package pt.iscte.pcd.storage_nodes;
 
-public class ByteBlockRequest {
+import java.io.Serializable;
+
+public class ByteBlockRequest implements Serializable {
     private int startIndex,length;
 
     public ByteBlockRequest(int startIndex){

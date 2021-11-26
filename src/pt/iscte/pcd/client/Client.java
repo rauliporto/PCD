@@ -47,8 +47,11 @@ public class Client {
         JLabel labelConsulta = new JLabel("Posição a consultar:");
         JLabel labelComprimento = new JLabel("Comprimento:");
         JButton buttonConsultar = new JButton("Consultar");
-        JTextArea textAreaRespostas = new JTextArea(900, 200);
-
+        JTextArea textAreaRespostas = new JTextArea(900,98);
+        textAreaRespostas.setEditable(true);
+        textAreaRespostas.setText("Introduza a posição e o tamanho a consultar");
+        textFieldConsulta.setText("1");
+        textFieldComprimento.setText("1");
         buttonConsultar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -60,8 +63,6 @@ public class Client {
                 } catch (IOException | ClassNotFoundException ex) {
                     ex.printStackTrace();
                 }
-                System.out.println("O que vai acontecer quando carregar consultar");
-                //TODO O QUE ACONTECE QUANDO CARREGO EM CONSULTAR
             }
         });
 
