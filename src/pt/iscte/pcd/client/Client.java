@@ -96,7 +96,7 @@ public class Client {
     private String convertToString(CloudByte[] received) {
         String aux = "";
         for (CloudByte a : received) {
-            aux = (aux + " " + a.getValue());
+            aux = (aux + " " + a.getValue() + "[ " + (!a.isParityOk()?"NOK":"OK") + "]" );
         }
         System.out.println("Valor da Informação recebida: " + aux);
         return aux;
