@@ -22,13 +22,11 @@ public class RequestsAnswerer extends Thread {
                 Socket nodeSocket = nodeServerSocket.accept();
                 ObjectInputStream in = new ObjectInputStream(nodeSocket.getInputStream());
                 ObjectOutputStream out = new ObjectOutputStream(nodeSocket.getOutputStream());
-
                 ByteBlockRequest received = (ByteBlockRequest) in.readObject();
                 if (received != null) {
-
                     CloudByte[] sendRequested = getSubCloudBytes(received);
                     out.writeObject(sendRequested);
-
+                    out.reset();
                 } else {
                     System.out.println("Erro ao obter informação do outro node");
                 }
@@ -39,11 +37,10 @@ public class RequestsAnswerer extends Thread {
     }
 
 
-
     public CloudByte[] getSubCloudBytes(ByteBlockRequest received) {
         CloudByte[] aux = new CloudByte[received.getLength()];
         for (int i = 0; i < aux.length; i++) {
-            aux[i] = file[i + received.getStartIndex()];
+            aux[i] = file[i + received.getStartIndex()-1];
         }
         return aux;
     }
