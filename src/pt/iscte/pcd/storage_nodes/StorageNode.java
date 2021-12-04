@@ -2,12 +2,7 @@ package pt.iscte.pcd.storage_nodes;
 
 import pt.iscte.pcd.CloudByte;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class StorageNode {
+
+    private static final int FILE_SIZE = 1000000;
 
     private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
     private Console console; // consola para responder aos comandos de erro solicitados
@@ -28,24 +25,52 @@ public class StorageNode {
     private PrintWriter out;
     private Socket socket;
     private CloudByte[] cloudArrayFile;
-    private ArrayList<String> nodesList;
-
+    private PoolRequests poolRequests;
 
     //Construtor
     public StorageNode(String directoryAdress, String directoryPort, String nodePort, String fileName) throws IOException {
         this.nodeAdress = directoryAdress;
         this.directoryPort = directoryPort;
         this.nodePort = nodePort;
+        directoryRegister();
         if (fileName != null) {
             System.out.println("Tem ficheiro para converter");
             convertToCloudBytes(fileName);
-            start();
-            RequestsAnswerer receiveConnection = new RequestsAnswerer(cloudArrayFile,nodePort);
-            receiveConnection.start();
-        } else {
+        }
+        else {
             System.out.println("Não tem ficheiro e vai buscar os NOS");
-            start();
-            getNodesList();
+            createRequestDownload();
+        }
+        startConsole();
+        startServerSocket(nodePort);
+    }
+
+    private void createRequestDownload() throws IOException {
+        ArrayList<String> nodesList =  getNodesList();
+        this.cloudArrayFile = new CloudByte[FILE_SIZE];
+        this.poolRequests = new PoolRequests(FILE_SIZE/100);
+        for(int i=0; i < nodesList.size(); i++){
+            String[] aux = nodesList.get(i).split(" ");
+            if(!aux[2].equals(nodePort)){
+            //    CRIAR THEREAD
+                System.out.println("NO: 1-" + aux[0] + " 2-" + aux[1] + " 3-" + aux[2]);
+                RequestsDownload requestsDownload = new RequestsDownload(aux[1],aux[2], poolRequests, cloudArrayFile);
+                requestsDownload.start();
+            }
+        }
+
+    }
+
+    private void startServerSocket(String nodePort) throws IOException {
+        ServerSocket nodeServerSocket = new ServerSocket(Integer.parseInt(nodePort));
+        while (true) {
+            try {
+                Socket nodeSocket = nodeServerSocket.accept();
+                RequestsAnswerer receiveConnection = new RequestsAnswerer(cloudArrayFile,nodeSocket);
+                receiveConnection.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -60,12 +85,15 @@ public class StorageNode {
     }
 
     // Ligação ao diretorio e inicio da consola, da GUI, pedidos e solicitação de pedidos
-    private void start() throws IOException {
+    private void directoryRegister() throws IOException {
         connect();
         register();
-        console = new Console();
-        console.start();
         System.out.println("Registo Efetuado no Diretorio");
+    }
+
+    private void startConsole(){
+       console = new Console(cloudArrayFile);
+        console.start();
     }
 
 
@@ -91,8 +119,8 @@ public class StorageNode {
 
 
     // obter a lista de todos os Nós atraves da solicitacao ao diretorio - ESBOÇO
-    public void getNodesList() throws IOException {
-        nodesList = new ArrayList<String>();
+    public ArrayList<String>  getNodesList() throws IOException {
+        ArrayList<String> nodesList  = new ArrayList<String>();
         String aux;
         out.println("nodes");
         System.out.println("A Obter os NOS do diretorio:");
@@ -107,53 +135,9 @@ public class StorageNode {
             }
         }
         System.out.println("Finalizada a lista");
+        return nodesList;
     }
 //metodos da coneccao estaticos da classe
-
-    /* --------------------------------------------------------------------
-       ------------------------------ CONSOLE -----------------------------
-                                   Classe Aninhada
-       --------------------------------------------------------------------  */
-    public class Console extends Thread {
-        public Console() {
-        }
-
-        @Override
-        public void run() {
-            System.out.println("Consola Ativada:");
-            System.out.println(" ");
-            System.out.println("Digite ERROR e o numero do byte");
-            Scanner in = new Scanner(System.in);
-            while (true) {
-                BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-                String command = null;
-                try {
-                    command = input.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(command);
-                if (command != null) {
-                    String[] result = command.split(" ");
-                    if ((result.length == 2) && (result[0].equals("ERROR"))) {
-                        System.out.println("Dados corretos");
-                        System.out.println(("A Injetar erro no byte " + result[1]));
-                        corruptByte(Integer.parseInt(result[1]));
-                    } else
-                        System.out.println("Comando inválido, por favor verifique os dados introduzidos");
-                } else
-                    System.out.println("Comando inválido, por favor verifique os dados introduzidos");
-            }
-        }
-
-        private void corruptByte(int nByte) {
-            System.out.println(cloudArrayFile[nByte - 1].toString());
-            cloudArrayFile[nByte - 1].makeByteCorrupt();
-            System.out.println("Byte Corrompido");
-            System.out.println(cloudArrayFile[nByte - 1].toString());
-        }
-
-    }
 
     /* --------------------------------------------------------------------
        ------------------------------  MAIN  ------------------------------

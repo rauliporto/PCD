@@ -4,11 +4,14 @@ import java.util.LinkedList;
 
 public class PoolRequests {
 
-    private LinkedList<ByteBlockRequest> results = new LinkedList<ByteBlockRequest>();
+    private LinkedList<ByteBlockRequest> results;
 
-    public synchronized void put(ByteBlockRequest newBlock) {
-        results.add(newBlock);
-        notifyAll();
+    public PoolRequests(int size){
+        results = new LinkedList<ByteBlockRequest>();
+        for(int i=0; i < size; i++){
+            results.add(new ByteBlockRequest(i*100));
+        }
+        System.out.println("Gravado :" + results.size() +" BB");
     }
 
     public synchronized ByteBlockRequest get() {
@@ -24,6 +27,5 @@ public class PoolRequests {
 
     public boolean isEmpty(){
         return results.isEmpty();
-
     }
 }

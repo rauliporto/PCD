@@ -83,7 +83,7 @@ public class Client {
 
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-        ByteBlockRequest request = new ByteBlockRequest(position, size);
+        ByteBlockRequest request = new ByteBlockRequest(position-1, size);
         out.writeObject(request);
         System.out.println("Solicitado Bloco ao Node");
         CloudByte[] received = (CloudByte[]) in.readObject();

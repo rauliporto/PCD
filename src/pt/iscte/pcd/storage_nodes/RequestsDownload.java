@@ -21,30 +21,34 @@ public class RequestsDownload extends Thread {
         this.file = file;
     }
 
-
     @Override
     public void run() {
+        int aux = 0;
         while (!pool.isEmpty()) {
+
             try {
                 InetAddress url = InetAddress.getByName(adressServer);
                 Socket socket = new Socket(url, Integer.parseInt(nodePortServer));
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
                 ByteBlockRequest blockRequest = pool.get();
+
                 out.writeObject(blockRequest);
                 CloudByte[] cloudBytesArray = (CloudByte[]) in.readObject();
-                saveDownloadedCloudBytes(cloudBytesArray,blockRequest);
+                saveDownloadedCloudBytes(cloudBytesArray, blockRequest);
+                aux++;
+                System.out.println(aux);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
         }
+        System.out.println("Feito download de " + aux + " blocos");
     }
 
-    public void saveDownloadedCloudBytes(CloudByte[] cloudBytesArray, ByteBlockRequest blockRequest){
-        for (int i = 0; i < blockRequest.getLength(); i++){
-            file[( i + blockRequest.getStartIndex())-1] = cloudBytesArray[i];
+    public void saveDownloadedCloudBytes(CloudByte[] cloudBytesArray, ByteBlockRequest blockRequest) {
+        for (int i = 0; i < blockRequest.getLength(); i++) {
+            file[(i + blockRequest.getStartIndex())] = cloudBytesArray[i];
         }
-
     }
 }
