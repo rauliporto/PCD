@@ -11,7 +11,7 @@ public class PoolRequests {
         for(int i=0; i < size; i++){
             results.add(new ByteBlockRequest(i*100));
         }
-        System.out.println("Gravado :" + results.size() +" BB");
+        System.out.println("Criado " + results.size() +" ByteBlockRequests");
     }
 
     public synchronized ByteBlockRequest get() {

@@ -16,7 +16,6 @@ public class StorageNode {
     private static final int FILE_SIZE = 1000000;
 
     private RequestsAnswerer requestsAnswerer; //Uma thread responsável por responder a pedidos dos outros nodes
-    private Console console; // consola para responder aos comandos de erro solicitados
     private ByteErrorChecker checker;
     private final String nodeAdress;
     private final String directoryPort;
@@ -24,49 +23,47 @@ public class StorageNode {
     private BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    private CloudByte[] cloudArrayFile;
-    private PoolRequests poolRequests;
+    private CloudByte[] file;
 
     //Construtor
     public StorageNode(String directoryAdress, String directoryPort, String nodePort, String fileName) throws IOException {
         this.nodeAdress = directoryAdress;
         this.directoryPort = directoryPort;
         this.nodePort = nodePort;
+        System.out.println("---------------------------------");
         directoryRegister();
+
+
         if (fileName != null) {
-            System.out.println("Tem ficheiro para converter");
             convertToCloudBytes(fileName);
+            System.out.println("Documento Convertido");
         }
         else {
-            System.out.println("Não tem ficheiro e vai buscar os NOS");
+            System.out.println("A Obter o Ficheiro");
+            this.file = new CloudByte[FILE_SIZE];
             createRequestDownload();
         }
         startConsole();
         startServerSocket(nodePort);
     }
 
+    //Lancamento dos ByteBlockRequest ref ao ficheiro que pretende fazer o download e das threads para irem buscar os CloudBytes
     private void createRequestDownload() throws IOException {
-        ArrayList<String> nodesList =  getNodesList();
-        this.cloudArrayFile = new CloudByte[FILE_SIZE];
-        this.poolRequests = new PoolRequests(FILE_SIZE/100);
+        ArrayList<String[]> nodesList =  getNodesList();
+        PoolRequests poolRequests = new PoolRequests(FILE_SIZE / 100);
         for(int i=0; i < nodesList.size(); i++){
-            String[] aux = nodesList.get(i).split(" ");
-            if(!aux[2].equals(nodePort)){
-            //    CRIAR THEREAD
-                System.out.println("NO: 1-" + aux[0] + " 2-" + aux[1] + " 3-" + aux[2]);
-                RequestsDownload requestsDownload = new RequestsDownload(aux[1],aux[2], poolRequests, cloudArrayFile);
-                requestsDownload.start();
-            }
+                System.out.println("Thread Criada para NO " + nodesList.get(i)[1] + "na porta " + nodesList.get(i)[2]);
+                (new RequestsDownload(nodesList.get(i)[1],nodesList.get(i)[2], poolRequests, file)).start();
         }
-
     }
 
+    // Lancamento da SocketServer para responnder aos pedidos , pedidos que são executados em Threads à parte
     private void startServerSocket(String nodePort) throws IOException {
         ServerSocket nodeServerSocket = new ServerSocket(Integer.parseInt(nodePort));
         while (true) {
             try {
                 Socket nodeSocket = nodeServerSocket.accept();
-                RequestsAnswerer receiveConnection = new RequestsAnswerer(cloudArrayFile,nodeSocket);
+                RequestsAnswerer receiveConnection = new RequestsAnswerer(file,nodeSocket);
                 receiveConnection.start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -74,67 +71,58 @@ public class StorageNode {
         }
     }
 
-    //Convert o ficheiro em array de cloudbytes
+    //Conversão do ficheiro em CloudBytes
     private void convertToCloudBytes(String fileName) throws IOException {
         byte[] fileArray = Files.readAllBytes(Paths.get(fileName));
-        cloudArrayFile = new CloudByte[fileArray.length];
+        this.file = new CloudByte[fileArray.length];
         for (int i = 0; i < fileArray.length; i++) {
-            cloudArrayFile[i] = new CloudByte(fileArray[i]);
+            this.file[i] = new CloudByte(fileArray[i]);
         }
-        System.out.println("Ficheiro totalmente convertido");
+
     }
 
-    // Ligação ao diretorio e inicio da consola, da GUI, pedidos e solicitação de pedidos
+    // Registo no Diretorio
     private void directoryRegister() throws IOException {
-        connect();
-        register();
-        System.out.println("Registo Efetuado no Diretorio");
-    }
-
-    private void startConsole(){
-       console = new Console(cloudArrayFile);
-        console.start();
-    }
-
-
-    // Criaçao de socket para contacto com servidor
-    private void connect() throws IOException {
         InetAddress url = InetAddress.getByName(nodeAdress);
         socket = new Socket(url, Integer.parseInt(directoryPort));
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+        out.println("INSC " + nodeAdress + " " + nodePort);
+        System.out.println("Registo Efetuado no Diretorio com os seguintes dados " + nodeAdress + " " + nodePort);
     }
 
-    // Finalização da socket de contacto com servidor
+    // Inicialização da consola e execucao da mesma
+    private void startConsole(){
+        (new Console(file)).start();
+    }
+
+
+
+
+    // Finalização da socket de contacto com o diretorio
     private void disconnect() throws IOException {
         socket.close();
     }
 
-    // Registar nó no diretorio
-    public void register() throws IOException {
-        String register_string = "INSC 127.0.0.1 " + nodePort;
-        System.out.println(" Valor da msg a enviar: " + register_string);
-        out.println(register_string);
-    }
-
-
-    // obter a lista de todos os Nós atraves da solicitacao ao diretorio - ESBOÇO
-    public ArrayList<String>  getNodesList() throws IOException {
-        ArrayList<String> nodesList  = new ArrayList<String>();
-        String aux;
+    // Obter listagem de todos os NOS exepto eu proprio
+    public ArrayList<String[]>  getNodesList() throws IOException {
+        ArrayList<String[]> nodesList  = new ArrayList<String[]>();
+        String[] aux;
         out.println("nodes");
-        System.out.println("A Obter os NOS do diretorio:");
+        System.out.println("----------- LISTA NOS -----------");
         while (true) {
-            aux = in.readLine();
-            if (aux.equals("END")) {
-                System.out.println("Não existem mais NOS");
+            aux = (in.readLine()).split(" ");
+            if (aux[0].equals("END")) {
+                System.out.println("              FIM                ");
                 break;
             } else {
-                nodesList.add(aux);
-                System.out.println(aux);
+                if (!aux[2].equals(nodePort)) {
+                    nodesList.add(aux);
+                    System.out.println("Valor " + aux[0] + aux[1] + aux[2]);
+                }
             }
         }
-        System.out.println("Finalizada a lista");
+        System.out.println("---------------------------------");
         return nodesList;
     }
 //metodos da coneccao estaticos da classe
@@ -144,7 +132,6 @@ public class StorageNode {
                                    Classe Main
        --------------------------------------------------------------------  */
     public static void main(String[] args) throws IOException {
-
         if ((args.length == 3) || (args.length == 4)) {
             StorageNode newNode;
             if (args.length == 3) {

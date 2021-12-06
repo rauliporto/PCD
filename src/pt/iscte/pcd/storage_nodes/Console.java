@@ -22,30 +22,31 @@ public class Console extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Consola Ativada:");
-        System.out.println(" ");
-        System.out.println("Digite ERROR e o numero do byte");
+        System.out.println("---------------------------------");
+        System.out.println("------------ Consola ------------");
         Scanner in = new Scanner(System.in);
         while (true) {
+            System.out.println(" ");
+            System.out.println("Digite:");
+            System.out.println("        ERROR X (onde X é o numero do byte)");
+            System.out.println("        ou ");
+            System.out.println("        EXIT (para sair) ");
             String command = in.nextLine();
             if (command != null) {
                 String[] result = command.split(" ");
                 if ((result.length == 2) && (result[0].equals("ERROR"))) {
-                    System.out.println("Dados corretos");
-                    System.out.println(("A Injetar erro no byte " + result[1]));
-                    corruptByte(Integer.parseInt(result[1]));
-                } else
-                    System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+                    System.out.println(("Valor do byte atual " + result[1]).toString());
+                    cloudArrayFile[Integer.parseInt(result[1])-1].makeByteCorrupt();
+                    System.out.println(("Valor do byte após ser corrompido " + result[1]).toString());
+                } else {
+                    if ((result.length == 1) && (result[0].equals("EXIT")))
+                        System.out.println("A fechar"); // Necessita de fechar as threads todas
+                    else
+                        System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+                }
+
             } else
-                System.out.println("Comando inválido, por favor verifique os dados introduzidos");
+                System.out.println("Nenhum comando detetado");
         }
     }
-
-    private void corruptByte(int nByte) {
-        System.out.println(cloudArrayFile[nByte - 1].toString());
-        cloudArrayFile[nByte - 1].makeByteCorrupt();
-        System.out.println("Corrompido");
-        System.out.println(cloudArrayFile[nByte - 1].toString());
-    }
-
 }

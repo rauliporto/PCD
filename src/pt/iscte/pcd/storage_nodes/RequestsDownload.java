@@ -23,7 +23,7 @@ public class RequestsDownload extends Thread {
 
     @Override
     public void run() {
-        int aux = 0;
+        int counter = 0;
         while (!pool.isEmpty()) {
 
             try {
@@ -36,14 +36,15 @@ public class RequestsDownload extends Thread {
                 out.writeObject(blockRequest);
                 CloudByte[] cloudBytesArray = (CloudByte[]) in.readObject();
                 saveDownloadedCloudBytes(cloudBytesArray, blockRequest);
-                aux++;
-                System.out.println(aux);
+                counter++;
+              //  System.out.println(counter);
+
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
         }
-        System.out.println("Feito download de " + aux + " blocos");
+        System.out.println("Feito download de " + counter + " blocos");
     }
 
     public void saveDownloadedCloudBytes(CloudByte[] cloudBytesArray, ByteBlockRequest blockRequest) {
