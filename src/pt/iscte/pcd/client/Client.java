@@ -2,6 +2,7 @@ package pt.iscte.pcd.client;
 
 import pt.iscte.pcd.CloudByte;
 import pt.iscte.pcd.storage_nodes.ByteBlockRequest;
+import pt.iscte.pcd.storage_nodes.NodeSocket;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -96,7 +97,7 @@ public class Client {
     private String convertToString(CloudByte[] received) {
         String aux = "";
         for (CloudByte a : received) {
-            aux = (aux + " " + a.getValue() + "[ " + (!a.isParityOk()?"NOK":"OK") + "]" );
+            aux = (aux + " " + a.getValue() + "[" + (!a.isParityOk()?"NOK":"OK") + "]" );
         }
         System.out.println("Valor da Informação recebida: " + aux);
         return aux;
