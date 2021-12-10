@@ -24,10 +24,7 @@ public class RequestsDownload extends Thread {
     @Override
     public void run() {
         int counter = 0;
-
-
         while (!pool.isEmpty()) {
-
             try {
                 ByteBlockRequest blockRequest = pool.get();
                 InetAddress url = InetAddress.getByName(adressServer);
@@ -38,8 +35,6 @@ public class RequestsDownload extends Thread {
                 CloudByte[] cloudBytesArray = (CloudByte[]) in.readObject();
                 saveDownloadedCloudBytes(cloudBytesArray, blockRequest);
                 counter++;
-                //  System.out.println(counter);
-
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }

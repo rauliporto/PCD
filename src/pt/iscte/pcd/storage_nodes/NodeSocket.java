@@ -25,11 +25,11 @@ public class NodeSocket {
     public void register() throws IOException {
         connect();
         out.println("INSC " + myIP + " " + nodePort);
-        if((in.readLine()).equals("OK"))
+        if ((in.readLine()).equals("OK"))
             System.out.println(" - Registado: " + myIP + " " + nodePort);
         else
             System.out.println(" -Já Registado: " + myIP + " " + nodePort);
-        disconnect();
+        // disconnect();
     }
 
     private void connect() throws IOException {
@@ -45,15 +45,19 @@ public class NodeSocket {
     }
 
     public ArrayList<String[]> getNodes() throws IOException {
-        connect();
+        // connect();
         ArrayList<String[]> nodesList = new ArrayList<String[]>();
         String[] aux;
         out.println("nodes");
+        System.out.println("---------------------------------");
+        System.out.println("- A Obter Lista                 -");
+        System.out.println("---------------------------------");
         System.out.println("----------- LISTA NOS -----------");
         while (true) {
             aux = (in.readLine()).split(" ");
             if (aux[0].equals("END")) {
-                System.out.println("              FIM                ");
+                System.out.println("---------------------------------");
+                System.out.println("------------- FIM ---------------");
                 break;
             } else {
                 if (!aux[2].equals(nodePort)) {
@@ -63,7 +67,7 @@ public class NodeSocket {
             }
         }
         System.out.println("---------------------------------");
-        disconnect();
+        // disconnect();
         return nodesList;
     }
 }

@@ -30,13 +30,14 @@ public class ByteErrorCorrection extends Thread {
     @Override
     public void run() {
         try {
-
             InetAddress url = InetAddress.getByName(adressServer);
             Socket socket = new Socket(url, Integer.parseInt(nodePortServer));
             (new ObjectOutputStream(socket.getOutputStream())).writeObject(request);
-            value.add(((CloudByte[]) (new ObjectInputStream(socket.getInputStream())).readObject())[0]);
-            cdl.countDown();
-            System.out.println("Valor coutndown " + cdl.getCount());
+            CloudByte received = ((CloudByte[]) (new ObjectInputStream(socket.getInputStream())).readObject())[0];
+            if(received.isParityOk()) {
+                value.add(received);
+                cdl.countDown();
+            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

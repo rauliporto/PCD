@@ -22,37 +22,28 @@ public class Console extends Thread {
 
     @Override
     public void run() {
-        System.out.println("---------------------------------");
-        System.out.println("------------ Consola ------------");
         Scanner in = new Scanner(System.in);
-        boolean close = false;
-        while (!close) {
-            System.out.println(" ");
-            System.out.println("Digite:");
-            System.out.println("        ERROR X (onde X é o numero do byte)");
-            System.out.println("        ou ");
-            System.out.println("        EXIT (para sair) ");
+        while (true) {
+            System.out.println("---------------------------------");
+            System.out.println("------------ Consola ------------");
+            System.out.println("---------------------------------");
+            System.out.println("- Digite:                       -");
+            System.out.println("-     - ERROR X (X=Nº do Byte)  -");
+            System.out.println("---------------------------------");
             String command = in.nextLine();
             if (command != null) {
                 String[] result = command.split(" ");
-                 // Byte do erro a injetar
+                // Byte do erro a injetar
                 if ((result.length == 2) && (result[0].equals("ERROR"))) {
-                    int byteError =  Integer.parseInt(result[1]);
-                    if((byteError > 0 ) && (byteError <= cloudArrayFile.length)) {
-                        System.out.println("Valor do byte atual " + cloudArrayFile[byteError - 1].getValue());
+                    int byteError = Integer.parseInt(result[1]);
+                    if ((byteError > 0) && (byteError <= cloudArrayFile.length)) {
+                        System.out.println("Valor do byte atual " + cloudArrayFile[byteError - 1].toString());
                         cloudArrayFile[byteError - 1].makeByteCorrupt();
-                        System.out.println("Valor do byte após ser corrompido " + cloudArrayFile[byteError - 1].getValue());
-                    }
-                    else
-                        System.out.println("Valor do Byte Inválido");
-                    } else {
-                    if ((result.length == 1) && (result[0].equals("EXIT"))) {
-                        close = true;
-                        System.out.println("A encerrar a consola");
+                        System.out.println("Valor do byte após ser corrompido " + cloudArrayFile[byteError - 1].toString());
                     } else
-                        System.out.println("Comando inválido, por favor verifique os dados introduzidos");
-                }
-
+                        System.out.println("Valor do Byte Inválido");
+                } else
+                    System.out.println("Comando inválido, por favor verifique os dados introduzidos");
             } else
                 System.out.println("Nenhum comando detetado");
         }

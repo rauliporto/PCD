@@ -21,13 +21,25 @@ public class StorageNode {
         socketDirectory.register();
         if (fileName != null) {
             convertToCloudBytes(fileName);
-            System.out.println("Documento Convertido");
+            System.out.println("---------------------------------");
+            System.out.println("----- Documento Convertido ------");
+            System.out.println("---------------------------------");
         } else {
-            System.out.println("A Obter o Ficheiro");
+            System.out.println("---------------------------------");
+            System.out.println("------ A Obter o Ficheiro -------");
+            System.out.println("---------------------------------");
             createRequestDownload();
         }
+        startSchedule(file, socketDirectory);
         startConsole();
         startServerSocket(nodePort);
+
+    }
+
+    // Inicia as tarefas
+    private void startSchedule(CloudByte[] file, NodeSocket socketDirectory) {
+        (new NodeSchedule(file, socketDirectory)).start();
+
     }
 
     // Obtenção do ficheiro através dos outros Nodes
@@ -65,7 +77,6 @@ public class StorageNode {
         for (int i = 0; i < fileBytes.length; i++) {
             this.file[i] = new CloudByte(fileBytes[i]);
         }
-
     }
 
     // Inicialização da Consola do Node
@@ -73,11 +84,13 @@ public class StorageNode {
         (new Console(file)).start();
     }
 
+
     // --------------------------------------------------------------------
     // ------------------------------  MAIN  ------------------------------
     // --------------------------------------------------------------------
 
     public static void main(String[] args) throws IOException, InterruptedException {
+
         if ((args.length == 3) || (args.length == 4)) {
             StorageNode newNode;
             if (args.length == 3) {
@@ -88,8 +101,6 @@ public class StorageNode {
         } else {
             System.err.println("Argumentos Inválidos");
         }
-        while (true) {
-            // Verficar esta parte
-        }
+
     }
 }
